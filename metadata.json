@@ -1,0 +1,6 @@
+{
+  "name": "Mass Luxury Home Tech",
+  "description": "Smart Paino Sink Workstation with tactile piano keys, hydroelectric LED display, flying rain waterfall, and complete 9-piece kit.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
