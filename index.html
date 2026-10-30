@@ -14,8 +14,179 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" crossorigin href="/assets/index.css">
+
+    <!-- Meta Pixel Code -->
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      
+      window.__META_PIXEL_ID__ = '947636671276929';
+      fbq('init', window.__META_PIXEL_ID__);
+      fbq('track', 'PageView');
+    </script>
+    <!-- End Meta Pixel Code -->
+
+    <!-- TikTok Pixel Code Start -->
+    <script>
+      !function (w, d, t) {
+        w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
+        var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
+        ;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+
+        ttq.load('DBH2RU3C77U4J2JQKLJG');
+        ttq.page();
+      }(window, document, 'ttq');
+    </script>
+    <!-- TikTok Pixel Code End -->
+
+    <!-- Meta Conversions API (CAPI) Client-Side Bridge & Deduplication -->
+    <script>
+      (function() {
+        // Parse cookie helper
+        function getCookie(name) {
+          var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+          return match ? decodeURIComponent(match[3]) : null;
+        }
+
+        // Get or build fbc from fbclid query parameter
+        function getFbc() {
+          var cookieFbc = getCookie('_fbc');
+          if (cookieFbc) return cookieFbc;
+          try {
+            var params = new URLSearchParams(window.location.search);
+            var fbclid = params.get('fbclid');
+            if (fbclid) {
+              return 'sub.1.' + Date.now() + '.' + fbclid;
+            }
+          } catch(e) {}
+          return null;
+        }
+
+        // Store user input as they fill the form for CAPI matching
+        window.__capiUserData = {
+          em: null,
+          ph: null,
+          fn: null,
+          ct: null
+        };
+
+        // Listen for form inputs to enrich CAPI events
+        document.addEventListener('input', function(e) {
+          var target = e.target;
+          if (!target || !target.name) return;
+          var name = target.name.toLowerCase();
+          var val = target.value;
+          if (!val) return;
+
+          if (name.includes('email')) {
+            window.__capiUserData.em = val;
+          } else if (name.includes('phone') || name.includes('whatsapp') || name.includes('tel')) {
+            window.__capiUserData.ph = val;
+          } else if (name.includes('name') || name.includes('fullname')) {
+            window.__capiUserData.fn = val;
+          } else if (name.includes('city') || name.includes('state') || name.includes('address')) {
+            window.__capiUserData.ct = val;
+          }
+
+          // TikTok Advanced Matching
+          if (window.ttq && typeof window.ttq.identify === 'function') {
+            try {
+              var ttIdentify = {};
+              if (window.__capiUserData.em) ttIdentify.email = window.__capiUserData.em;
+              if (window.__capiUserData.ph) ttIdentify.phone_number = window.__capiUserData.ph;
+              if (Object.keys(ttIdentify).length > 0) {
+                window.ttq.identify(ttIdentify);
+              }
+            } catch(e) {}
+          }
+        }, true);
+
+        // Core CAPI dispatcher
+        window.dispatchMetaCapiEvent = function(eventName, customData, eventId) {
+          eventId = eventId || ('capi_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8));
+          var payload = {
+            event_name: eventName,
+            event_id: eventId,
+            event_source_url: window.location.href,
+            custom_data: customData || {},
+            user_data: {
+              fbp: getCookie('_fbp'),
+              fbc: getFbc(),
+              em: window.__capiUserData.em,
+              ph: window.__capiUserData.ph,
+              fn: window.__capiUserData.fn,
+              ct: window.__capiUserData.ct
+            }
+          };
+
+          try {
+            fetch('/api/meta-conversions', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            }).then(function(res) {
+              return res.json();
+            }).then(function(data) {
+              console.log('[Meta CAPI Log]', eventName, '->', data);
+            }).catch(function(err) {
+              console.debug('[Meta CAPI Network Log]', err);
+            });
+          } catch (err) {
+            console.debug('[Meta CAPI Dispatch Error]', err);
+          }
+
+          return eventId;
+        };
+
+        // Hook window.fbq to automatically forward all track calls to CAPI with shared eventID for deduplication
+        var originalFbq = window.fbq;
+        if (originalFbq) {
+          window.fbq = function() {
+            var args = Array.prototype.slice.call(arguments);
+            var action = args[0];
+            var eventName = args[1];
+            var eventData = args[2] || {};
+            var options = args[3] || {};
+
+            if (action === 'track' && typeof eventName === 'string') {
+              // Ensure an eventID exists for deduplication between Pixel & CAPI
+              if (!options.eventID) {
+                options.eventID = 'ev_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+              }
+              args[3] = options;
+
+              // Fire server-side Conversions API in parallel
+              window.dispatchMetaCapiEvent(eventName, eventData, options.eventID);
+            }
+
+            return originalFbq.apply(window, args);
+          };
+
+          // Preserve fbq properties
+          for (var key in originalFbq) {
+            if (Object.prototype.hasOwnProperty.call(originalFbq, key)) {
+              window.fbq[key] = originalFbq[key];
+            }
+          }
+        }
+
+        // Fire initial PageView to CAPI
+        window.dispatchMetaCapiEvent('PageView');
+      })();
+    </script>
   </head>
   <body class="bg-[#0b0f14] text-[#e2e8f0] antialiased selection:bg-amber-500/30 selection:text-amber-200">
+    <noscript>
+      <img height="1" width="1" style="display:none"
+           src="https://www.facebook.com/tr?id=947636671276929&ev=PageView&noscript=1"
+           alt="Meta Pixel" />
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
